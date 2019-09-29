@@ -1,0 +1,23 @@
+@import 'style/main.wxss';
+@import 'style/theme/light.wxss';
+@import 'style/theme/dark.wxss';
+
+.h2w-light .h2w__a {
+  color: #36a1f0;
+  border-bottom-color: #36a1f0;
+}
+
+.h2w-dark .h2w__a {
+  color: #36a1f0;
+  border-bottom-color: #36a1f0;
+}
+
+.h2w__a {
+  border-bottom-color: #36a1f0;
+}
+
+.h2w__ad {
+  margin-top: 3vh;
+  margin-left: -11rpx;
+  margin-bottom: 3vh;
+}

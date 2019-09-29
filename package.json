@@ -1,0 +1,10 @@
+{
+  "name": "wx-markdown",
+  "miniprogram": "markdown",
+  "dependencies": {
+    "towxml": "pcit-ce/towxml"
+  },
+  "scripts": {
+    "build": "npx tsc index.ts"
+  }
+}
