@@ -11,7 +11,7 @@ IDE 构建 `npm`
 ```json
 {
   "usingComponents": {
-    "markdown": "wx-markdown/index"
+    "markdown": "wx-markdown/component/index"
   }
 }
 ```

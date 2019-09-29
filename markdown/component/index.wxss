@@ -1,6 +1,6 @@
-@import 'style/main.wxss';
-@import 'style/theme/light.wxss';
-@import 'style/theme/dark.wxss';
+@import '../style/main.wxss';
+@import '../style/theme/light.wxss';
+@import '../style/theme/dark.wxss';
 
 .h2w-light .h2w__a {
   color: #36a1f0;
