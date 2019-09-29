@@ -1,10 +1,10 @@
 # WX-markdown
 
 ```bash
-$ npm i docker-practice/wx-markdown
+$ npm i docker-practice/wx-markdown --save
 ```
 
-IDE 构建 `npm`
+`微信开发者工具` -> `构建 npm`
 
 `page.json`
 
@@ -21,3 +21,5 @@ IDE 构建 `npm`
 ```html
 <markdown markdown="# Title"></markdown>
 ```
+
+更多属性请查看 `markdown/component/index.ts`

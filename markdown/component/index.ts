@@ -1,4 +1,3 @@
-// @ts-ignore
 import * as MarkdownHandler from 'towxml';
 
 const towxml = new MarkdownHandler();
@@ -6,11 +5,19 @@ const towxml = new MarkdownHandler();
 function randomInsert(insertArr: Array<any>, arr: Array<any>) {
   // console.log(arr.length);
   if (arr.length > 30) {
-    insertArr = [...insertArr, { node: 'ad', adId: 'adunit-1246f0a5e441ea4c' }];
+    insertArr = [...insertArr];
+  } else {
+    insertArr = [insertArr[0]];
   }
+
+  try{
   insertArr.forEach((value: any) =>
     arr.splice(Math.random() * arr.length, 0, value),
   );
+  }catch(e){
+
+  }
+
   return arr;
 }
 
@@ -37,15 +44,16 @@ Component({
     // markdown 原始数据
     markdown: {
       type: String,
-      value: '',
+      value: '', // '# title'
+      optionalTypes: [String,Object]
     },
     theme: {
       type: String,
-      value: 'light',
+      value: 'light', // 'light' | 'dark'
     },
     ad: {
-      type: String,
-      value: '',
+      type: Array,
+      value: [], // ["",""]
     },
     fontType: {
       type: String,
@@ -55,30 +63,52 @@ Component({
       type: String,
       value: '',
     },
+    isTowxml: { // 是否为 towxml 处理过的数据
+      type: Boolean,
+      value: false,
+    }
   },
   data: {
     MDdata: '',
   },
   lifetimes: {
-    attached(): void {},
+    attached(): void {
+    },
   },
   observers: {
     markdown() {
-      // @ts-ignore
-      if (this.properties.markdown === '') {
+      const {markdown, theme, ad, fontType,isTowxml} = this.properties;
+
+      if (markdown === '') {
+        this.setData({
+          MDdata: '',
+        });
+
         return;
       }
-      // @ts-ignore
-      let MDdata = towxml.toJson(this.properties.markdown, 'markdown');
-      // @ts-ignore
-      MDdata.theme = this.properties.theme;
-      MDdata.child = randomInsert(
-        [{ node: 'ad', adId: 'adunit-3ea71b7cfce6c721' }],
-        MDdata.child,
-      );
-      // @ts-ignore
-      MDdata.fontType = this.properties.fontType;
-      // @ts-ignore
+
+      if (isTowxml) {
+        this.setData({
+          MDdata: markdown,
+        });
+
+        return;
+      }
+
+      let MDdata = towxml.toJson(markdown, 'markdown');
+
+      if (ad !== []) {
+        MDdata.child = randomInsert(
+          ad.map((adId: string) => {
+            return {node: 'ad', adId}
+          }),
+          MDdata.child,
+        );
+      }
+
+      MDdata.theme = theme;
+      MDdata.fontType = fontType;
+
       this.setData({
         MDdata,
       });
@@ -134,8 +164,7 @@ Component({
         return;
       }
 
-      // @ts-ignore
-      const folder = this.properties.folder;
+      const {folder} = this.properties;
 
       href = folder === '/' ? href : folder + href;
 
@@ -151,6 +180,7 @@ Component({
       return null;
     },
 
-    __bind_touchcancel() {},
+    __bind_touchcancel() {
+    },
   },
 });

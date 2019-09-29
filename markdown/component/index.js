@@ -7,17 +7,23 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 exports.__esModule = true;
-// @ts-ignore
 var MarkdownHandler = require("towxml");
 var towxml = new MarkdownHandler();
 function randomInsert(insertArr, arr) {
     // console.log(arr.length);
     if (arr.length > 30) {
-        insertArr = __spreadArrays(insertArr, [{ node: 'ad', adId: 'adunit-1246f0a5e441ea4c' }]);
+        insertArr = __spreadArrays(insertArr);
     }
-    insertArr.forEach(function (value) {
-        return arr.splice(Math.random() * arr.length, 0, value);
-    });
+    else {
+        insertArr = [insertArr[0]];
+    }
+    try {
+        insertArr.forEach(function (value) {
+            return arr.splice(Math.random() * arr.length, 0, value);
+        });
+    }
+    catch (e) {
+    }
     return arr;
 }
 function parsePath(href) {
@@ -39,15 +45,16 @@ Component({
         // markdown 原始数据
         markdown: {
             type: String,
-            value: ''
+            value: '',
+            optionalTypes: [String, Object]
         },
         theme: {
             type: String,
             value: 'light'
         },
         ad: {
-            type: String,
-            value: ''
+            type: Array,
+            value: []
         },
         fontType: {
             type: String,
@@ -56,28 +63,42 @@ Component({
         folder: {
             type: String,
             value: ''
+        },
+        isTowxml: {
+            type: Boolean,
+            value: false
         }
     },
     data: {
         MDdata: ''
     },
     lifetimes: {
-        attached: function () { }
+        attached: function () {
+        }
     },
     observers: {
         markdown: function () {
-            // @ts-ignore
-            if (this.properties.markdown === '') {
+            var _a = this.properties, markdown = _a.markdown, theme = _a.theme, ad = _a.ad, fontType = _a.fontType, isTowxml = _a.isTowxml;
+            if (markdown === '') {
+                this.setData({
+                    MDdata: ''
+                });
                 return;
             }
-            // @ts-ignore
-            var MDdata = towxml.toJson(this.properties.markdown, 'markdown');
-            // @ts-ignore
-            MDdata.theme = this.properties.theme;
-            MDdata.child = randomInsert([{ node: 'ad', adId: 'adunit-3ea71b7cfce6c721' }], MDdata.child);
-            // @ts-ignore
-            MDdata.fontType = this.properties.fontType;
-            // @ts-ignore
+            if (isTowxml) {
+                this.setData({
+                    MDdata: markdown
+                });
+                return;
+            }
+            var MDdata = towxml.toJson(markdown, 'markdown');
+            if (ad !== []) {
+                MDdata.child = randomInsert(ad.map(function (adId) {
+                    return { node: 'ad', adId: adId };
+                }), MDdata.child);
+            }
+            MDdata.theme = theme;
+            MDdata.fontType = fontType;
             this.setData({
                 MDdata: MDdata
             });
@@ -126,7 +147,6 @@ Component({
                 !href.match(/.md$/g)) {
                 return;
             }
-            // @ts-ignore
             var folder = this.properties.folder;
             href = folder === '/' ? href : folder + href;
             if (href.match(/../g)) {
@@ -138,6 +158,7 @@ Component({
             });
             return null;
         },
-        __bind_touchcancel: function () { }
+        __bind_touchcancel: function () {
+        }
     }
 });
