@@ -1,5 +1,6 @@
 {
   "name": "wx-markdown",
+  "version": "0.0.1",
   "miniprogram": "markdown",
   "dependencies": {
     "towxml": "pcit-ce/towxml"

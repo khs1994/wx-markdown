@@ -41,7 +41,7 @@ function parsePath(href: string) {
 
 Component({
   properties: {
-    // markdown 原始数据
+    // markdown 原始数据或者 towxml 处理过的数据（isTowxml="{{true}}"）
     markdown: {
       type: String,
       value: '', // '# title'
@@ -63,7 +63,7 @@ Component({
       type: String,
       value: '',
     },
-    isTowxml: { // 是否为 towxml 处理过的数据
+    isTowxml: { // 属性 markdown 是否为 towxml 处理过的数据
       type: Boolean,
       value: false,
     }
