@@ -3,9 +3,17 @@
   "version": "0.0.1",
   "miniprogram": "markdown",
   "dependencies": {
-    "towxml": "pcit-ce/towxml"
+    "@pcit/towxml": "0.0.2"
+  },
+  "devDependencies": {
+    "miniprogram-api-typings": "^2.8.3"
   },
   "scripts": {
-    "build": "npx tsc"
+    "build": "npx tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/docker-practice/wx-markdown.git"
   }
 }

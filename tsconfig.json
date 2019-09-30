@@ -1,6 +1,10 @@
 {
   "compilerOptions": {
-    "newLine": "LF"
+    "newLine": "LF",
+    "typeRoots": [
+      "./node_modules/miniprogram-api-typings"
+    ],
+    "lib": ["es2015"]
   },
   "include": [
     "./**/*.ts"

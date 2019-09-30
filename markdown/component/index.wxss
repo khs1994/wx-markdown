@@ -34,3 +34,16 @@
   border-bottom-style: none;
   /* font-size: 40rpx; */
 }
+
+.h2w__pre .h2w__code {
+  font-size: 125%;
+  width: 100%;
+}
+
+.h2w__code {
+ font-size: 99%;
+}
+
+.h2w {
+ font-size: 34rpx;
+}

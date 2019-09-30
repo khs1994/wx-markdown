@@ -1,4 +1,4 @@
-import * as MarkdownHandler from 'towxml';
+import * as MarkdownHandler from '@pcit/towxml';
 import openGithub from "../utils/openGitHub";
 
 const towxml = new MarkdownHandler();

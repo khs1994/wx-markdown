@@ -7,7 +7,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 exports.__esModule = true;
-var MarkdownHandler = require("towxml");
+var MarkdownHandler = require("@pcit/towxml");
 var openGitHub_1 = require("../utils/openGitHub");
 var towxml = new MarkdownHandler();
 function randomInsert(insertArr, arr) {
