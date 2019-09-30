@@ -1,7 +1,7 @@
 # WX-markdown
 
 ```bash
-$ npm i docker-practice/wx-markdown --save
+$ npm i wx-markdown --save
 ```
 
 `微信开发者工具` -> `(左上角)工具` -> [`构建 npm`](https://developers.weixin.qq.com/miniprogram/dev/devtools/npm.html)
