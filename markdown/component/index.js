@@ -8,6 +8,7 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
 };
 exports.__esModule = true;
 var MarkdownHandler = require("towxml");
+var openGitHub_1 = require("../utils/openGitHub");
 var towxml = new MarkdownHandler();
 function randomInsert(insertArr, arr) {
     // console.log(arr.length);
@@ -42,7 +43,7 @@ function parsePath(href) {
 }
 Component({
     properties: {
-        // markdown 原始数据
+        // markdown 原始数据或者 towxml 处理过的数据（isTowxml="{{true}}"）
         markdown: {
             type: String,
             value: '',
@@ -67,6 +68,10 @@ Component({
         isTowxml: {
             type: Boolean,
             value: false
+        },
+        navigator: {
+            type: Boolean,
+            value: true
         }
     },
     data: {
@@ -141,13 +146,22 @@ Component({
         __bind_tap: function (res) {
             console.log(res);
             var href = res.currentTarget.dataset._el.attr.href || '';
+            if (href !== '') {
+                console.log(href);
+            }
+            var _a = this.properties, folder = _a.folder, navigator = _a.navigator;
+            if (href.match(/^https:\/\/github.com/)) {
+                var array = href.split('/');
+                var user = array[3] || null;
+                var repo = array[4] || null;
+                openGitHub_1["default"](user, repo);
+            }
             if (href.match(/^http:\/\//g) ||
                 href.match(/^https:\/\//g) ||
                 href === '' ||
-                !href.match(/.md$/g)) {
+                !href.match(/.md$/g) || !navigator) {
                 return;
             }
-            var folder = this.properties.folder;
             href = folder === '/' ? href : folder + href;
             if (href.match(/../g)) {
                 console.log(href);

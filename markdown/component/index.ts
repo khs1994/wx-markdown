@@ -1,4 +1,5 @@
 import * as MarkdownHandler from 'towxml';
+import openGithub from "../utils/openGitHub";
 
 const towxml = new MarkdownHandler();
 
@@ -10,11 +11,11 @@ function randomInsert(insertArr: Array<any>, arr: Array<any>) {
     insertArr = [insertArr[0]];
   }
 
-  try{
-  insertArr.forEach((value: any) =>
-    arr.splice(Math.random() * arr.length, 0, value),
-  );
-  }catch(e){
+  try {
+    insertArr.forEach((value: any) =>
+      arr.splice(Math.random() * arr.length, 0, value),
+    );
+  } catch (e) {
 
   }
 
@@ -45,7 +46,7 @@ Component({
     markdown: {
       type: String,
       value: '', // '# title'
-      optionalTypes: [String,Object]
+      optionalTypes: [String, Object]
     },
     theme: {
       type: String,
@@ -66,6 +67,10 @@ Component({
     isTowxml: { // 属性 markdown 是否为 towxml 处理过的数据
       type: Boolean,
       value: false,
+    },
+    navigator: { // 是否触发点击事件，若 markdown 为目录(summary)请设为 false
+      type: Boolean,
+      value: true,
     }
   },
   data: {
@@ -77,7 +82,7 @@ Component({
   },
   observers: {
     markdown() {
-      const {markdown, theme, ad, fontType,isTowxml} = this.properties;
+      const {markdown, theme, ad, fontType, isTowxml} = this.properties;
 
       if (markdown === '') {
         this.setData({
@@ -155,16 +160,28 @@ Component({
       console.log(res);
       let href = res.currentTarget.dataset._el.attr.href || '';
 
+      if (href !== '') {
+        console.log(href);
+      }
+
+      const {folder, navigator} = this.properties;
+
+      if (href.match(/^https:\/\/github.com/)) {
+        let array = href.split('/');
+        let user = array[3] || null
+        let repo = array[4] || null;
+
+        openGithub(user, repo);
+      }
+
       if (
         href.match(/^http:\/\//g) ||
         href.match(/^https:\/\//g) ||
         href === '' ||
-        !href.match(/.md$/g)
+        !href.match(/.md$/g) || !navigator
       ) {
         return;
       }
-
-      const {folder} = this.properties;
 
       href = folder === '/' ? href : folder + href;
 

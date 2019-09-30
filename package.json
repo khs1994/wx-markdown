@@ -6,6 +6,6 @@
     "towxml": "pcit-ce/towxml"
   },
   "scripts": {
-    "build": "cd markdown/component && npx tsc index.ts"
+    "build": "npx tsc"
   }
 }
