@@ -22,7 +22,7 @@ $ npm i wx-markdown --save
 <markdown markdown="# Title"></markdown>
 ```
 
-更多属性请查看 `markdown/component/index.ts`
+更多属性请查看 [`markdown/component/index.ts`](markdown/component/index.ts)
 
 ## 功能
 

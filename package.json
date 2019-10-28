@@ -1,16 +1,17 @@
 {
   "name": "wx-markdown",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "miniprogram": "markdown",
   "dependencies": {
     "@pcit/towxml": "0.0.2"
   },
   "devDependencies": {
-    "miniprogram-api-typings": "^2.8.3"
+    "miniprogram-api-typings": "^2.9.0"
   },
   "scripts": {
     "build": "npx tsc",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "fmt": "npx prettier --write markdown/component/index.ts"
   },
   "repository": {
     "type": "git",

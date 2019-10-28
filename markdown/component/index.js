@@ -23,14 +23,13 @@ function randomInsert(insertArr, arr) {
             return arr.splice(Math.random() * arr.length, 0, value);
         });
     }
-    catch (e) {
-    }
+    catch (e) { }
     return arr;
 }
 function parsePath(href) {
-    var arr = href.split('/');
+    var arr = href.split("/");
     while (true) {
-        var index = arr.indexOf('..');
+        var index = arr.indexOf("..");
         if (index === -1) {
             break;
         }
@@ -39,54 +38,73 @@ function parsePath(href) {
         // remove null
         arr = arr.filter(function (d) { return d; });
     }
-    return arr.join('/');
+    return arr.join("/");
 }
 Component({
     properties: {
-        // markdown 原始数据或者 towxml 处理过的数据（isTowxml="{{true}}"）
+        // markdown 原始数据或者 towxml 处理过的数据（is-towxml="{{true}}"）
         markdown: {
             type: String,
-            value: '',
+            value: "",
             optionalTypes: [String, Object]
         },
         theme: {
             type: String,
-            value: 'light'
+            value: "light" // 'light' | 'dark'
         },
         ad: {
             type: Array,
-            value: []
+            value: [] // ["",""]
         },
         fontType: {
             type: String,
-            value: ''
+            value: ""
         },
         folder: {
             type: String,
-            value: ''
+            value: ""
         },
         isTowxml: {
+            // 属性 markdown 是否为 towxml 处理过的数据
             type: Boolean,
             value: false
         },
         navigator: {
+            // 是否触发点击事件，若 markdown 为目录(summary)请设为 false
             type: Boolean,
             value: true
+        },
+        key: {
+            type: String,
+            value: ""
+        },
+        cache: {
+            type: Boolean,
+            value: true
+        },
+        passMdByCache: {
+            // markdown 传入的是 MD 数据缓存 key,
+            // 即 markdown 可以传入 md 原始数据，也可以传入缓存 key(这个 缓存 key 存储的是 md 原始数据)
+            type: Boolean,
+            value: false
         }
     },
     data: {
-        MDdata: ''
+        MDdata: ""
     },
     lifetimes: {
-        attached: function () {
-        }
+        attached: function () { }
     },
     observers: {
         markdown: function () {
-            var _a = this.properties, markdown = _a.markdown, theme = _a.theme, ad = _a.ad, fontType = _a.fontType, isTowxml = _a.isTowxml;
-            if (markdown === '') {
+            var _a = this.properties, markdown = _a.markdown, theme = _a.theme, ad = _a.ad, fontType = _a.fontType, isTowxml = _a.isTowxml, key = _a.key, cache = _a.cache, passMdByCache = _a.passMdByCache;
+            if (passMdByCache) {
+                markdown = wx.getStorageSync(markdown);
+                console.log('get markdown from cache');
+            }
+            if (markdown === "") {
                 this.setData({
-                    MDdata: ''
+                    MDdata: ""
                 });
                 return;
             }
@@ -96,10 +114,22 @@ Component({
                 });
                 return;
             }
-            var MDdata = towxml.toJson(markdown, 'markdown');
+            var MDdata;
+            var MDdataFromCache = wx.getStorageSync("wx-markdown/" + key);
+            if (key !== "" && MDdataFromCache && cache) {
+                MDdata = JSON.parse(MDdataFromCache);
+                console.log("cached");
+            }
+            else {
+                MDdata = towxml.toJson(markdown, "markdown");
+                wx.setStorage({
+                    key: "wx-markdown/" + key,
+                    data: JSON.stringify(MDdata)
+                });
+            }
             if (ad !== []) {
                 MDdata.child = randomInsert(ad.map(function (adId) {
-                    return { node: 'ad', adId: adId };
+                    return { node: "ad", adId: adId };
                 }), MDdata.child);
             }
             MDdata.theme = theme;
@@ -145,34 +175,34 @@ Component({
         // @ts-ignore
         __bind_tap: function (res) {
             console.log(res);
-            var href = res.currentTarget.dataset._el.attr.href || '';
-            if (href !== '') {
+            var href = res.currentTarget.dataset._el.attr.href || "";
+            if (href !== "") {
                 console.log(href);
             }
             var _a = this.properties, folder = _a.folder, navigator = _a.navigator;
             if (href.match(/^https:\/\/github.com/)) {
-                var array = href.split('/');
+                var array = href.split("/");
                 var user = array[3] || null;
                 var repo = array[4] || null;
                 openGitHub_1["default"](user, repo);
             }
             if (href.match(/^http:\/\//g) ||
                 href.match(/^https:\/\//g) ||
-                href === '' ||
-                !href.match(/.md$/g) || !navigator) {
+                href === "" ||
+                !href.match(/.md$/g) ||
+                !navigator) {
                 return;
             }
-            href = folder === '/' ? href : folder + href;
+            href = folder === "/" ? href : folder + href;
             if (href.match(/../g)) {
                 console.log(href);
                 href = parsePath(href);
             }
             wx.navigateTo({
-                url: 'index?key=' + href
+                url: "index?key=" + href
             });
             return null;
         },
-        __bind_touchcancel: function () {
-        }
+        __bind_touchcancel: function () { }
     }
 });
