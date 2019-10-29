@@ -2,6 +2,7 @@ import * as MarkdownHandler from "@pcit/towxml";
 import openGithub from "../utils/openGitHub";
 
 const towxml = new MarkdownHandler();
+import toRichtext from "./toRichtext";
 
 function randomInsert(insertArr: Array<any>, arr: Array<any>) {
   // console.log(arr.length);
@@ -40,7 +41,9 @@ function parsePath(href: string) {
 
 Component({
   properties: {
-    // markdown 原始数据或者 towxml 处理过的数据（is-towxml="{{true}}"）
+    // markdown 原始数据
+    // 或者 towxml 处理过的数据(is-towxml="{{true}}")
+    // 或者缓存 key (pass-md-by-cache="{{true}}")
     markdown: {
       type: String,
       value: "", // '# title'
@@ -68,24 +71,32 @@ Component({
       value: false
     },
     navigator: {
-      // 是否触发点击事件，若 markdown 为目录(summary)请设为 false
+      // 是否触发点击事件，若为目录(summary)请设为 false
       type: Boolean,
       value: true
     },
-    key: { // markdown key, 启用缓存时需要
+    key: {
+      // markdown key, 启用缓存时需要
       type: String,
       value: ""
     },
-    cache: { // 是否启用缓存
+    cache: {
+      // 是否启用缓存
       type: Boolean,
       value: true
     },
-    passMdByCache:{ 
+    passMdByCache: {
       // markdown 传入的是 MD 数据缓存 key,
-      // 即 markdown 可以传入 md 原始数据，也可以传入缓存 key(这个 缓存 key 存储的是 md 原始数据)
+      // 即 markdown 可以传入 md 原始数据，
+      // 也可以传入缓存 key(这个 缓存 key 存储的是 md 原始数据)
       type: Boolean,
-      value: false,
+      value: false
     },
+    richtext: {
+      // 使用 rich-text 渲染，若为目录(summary)请设为 false，因为不支持跳转
+      type: Boolean,
+      value: false
+    }
   },
   data: {
     MDdata: ""
@@ -104,11 +115,12 @@ Component({
         key,
         cache,
         passMdByCache,
+        richtext
       } = this.properties;
 
-      if(passMdByCache){
+      if (passMdByCache) {
         markdown = wx.getStorageSync(markdown);
-        console.log('get markdown from cache');
+        console.log("get markdown from cache");
       }
 
       if (markdown === "") {
@@ -120,6 +132,12 @@ Component({
       }
 
       if (isTowxml) {
+        if (richtext) {
+          markdown.child = toRichtext(markdown.child);
+          markdown.richtext = true;
+          markdown.adId = ad[0];
+        }
+
         this.setData({
           MDdata: markdown
         });
@@ -142,13 +160,20 @@ Component({
         });
       }
 
-      if (ad !== []) {
-        MDdata.child = randomInsert(
-          ad.map((adId: string) => {
-            return { node: "ad", adId };
-          }),
-          MDdata.child
-        );
+      if (richtext) {
+        // 富文本不能包括 ad
+        MDdata.child = toRichtext(MDdata.child);
+        MDdata.richtext = true;
+        MDdata.adId = ad[0];
+      } else {
+        if (ad !== []) {
+          MDdata.child = randomInsert(
+            ad.map((adId: string) => {
+              return { node: "ad", adId };
+            }),
+            MDdata.child
+          );
+        }
       }
 
       MDdata.theme = theme;
@@ -240,8 +265,8 @@ Component({
 
     __bind_touchcancel() {},
 
-    adError(e){
+    adError(e) {
       console.log(e);
-    },
+    }
   }
 });

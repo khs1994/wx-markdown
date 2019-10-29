@@ -11,7 +11,7 @@
   "scripts": {
     "build": "npx tsc",
     "prepublishOnly": "npm run build",
-    "fmt": "npx prettier --write markdown/component/index.ts"
+    "fmt": "npx prettier --write markdown/component/*.ts"
   },
   "repository": {
     "type": "git",
