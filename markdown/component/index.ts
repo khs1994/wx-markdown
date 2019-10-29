@@ -133,7 +133,7 @@ Component({
 
       if (key !== "" && MDdataFromCache && cache) {
         MDdata = JSON.parse(MDdataFromCache);
-        console.log("cached");
+        console.log("wx-markdown cached");
       } else {
         MDdata = towxml.toJson(markdown, "markdown");
         wx.setStorage({
@@ -238,6 +238,10 @@ Component({
       return null;
     },
 
-    __bind_touchcancel() {}
+    __bind_touchcancel() {},
+
+    adError(e){
+      console.log(e);
+    },
   }
 });

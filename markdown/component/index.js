@@ -118,7 +118,7 @@ Component({
             var MDdataFromCache = wx.getStorageSync("wx-markdown/" + key);
             if (key !== "" && MDdataFromCache && cache) {
                 MDdata = JSON.parse(MDdataFromCache);
-                console.log("cached");
+                console.log("wx-markdown cached");
             }
             else {
                 MDdata = towxml.toJson(markdown, "markdown");
@@ -203,6 +203,9 @@ Component({
             });
             return null;
         },
-        __bind_touchcancel: function () { }
+        __bind_touchcancel: function () { },
+        adError: function (e) {
+            console.log(e);
+        }
     }
 });
