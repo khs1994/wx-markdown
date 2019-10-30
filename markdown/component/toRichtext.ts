@@ -11,9 +11,6 @@ export default function toRichtext(towxmlChild) {
     if (iterator.node === "text") {
       type = "text";
       text = iterator.text;
-      if (text === "\n") {
-        continue;
-      }
     }
     if (childrens) {
       children = toRichtext(childrens);

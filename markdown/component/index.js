@@ -96,6 +96,10 @@ Component({
         },
         richtext: {
             // 使用 rich-text 渲染，若为目录(summary)请设为 false，因为不支持跳转
+            // 不支持页面跳转
+            // 不支持长按图片
+            // 不支持事件监听
+            // https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
             type: Boolean,
             value: false
         }
