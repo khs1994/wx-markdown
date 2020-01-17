@@ -18,8 +18,8 @@ function toRichtext(towxmlChild) {
         var childrens = iterator.child;
         var type = void 0;
         var text = void 0;
-        if (iterator.node === "text") {
-            type = "text";
+        if (iterator.node === 'text') {
+            type = 'text';
             text = iterator.text;
         }
         if (childrens) {

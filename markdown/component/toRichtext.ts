@@ -8,8 +8,8 @@ export default function toRichtext(towxmlChild) {
     let childrens = iterator.child;
     let type;
     let text;
-    if (iterator.node === "text") {
-      type = "text";
+    if (iterator.node === 'text') {
+      type = 'text';
       text = iterator.text;
     }
     if (childrens) {

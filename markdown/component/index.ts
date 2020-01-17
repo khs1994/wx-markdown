@@ -1,8 +1,7 @@
-import * as MarkdownHandler from "@pcit/towxml";
-import openGithub from "../utils/openGitHub";
+import openGithub from '../utils/openGitHub';
 
-const towxml = new MarkdownHandler();
-import toRichtext from "./toRichtext";
+import * as towxml from 'towxml';
+import toRichtext from './toRichtext';
 
 function randomInsert(insertArr: Array<any>, arr: Array<any>) {
   // console.log(arr.length);
@@ -14,7 +13,7 @@ function randomInsert(insertArr: Array<any>, arr: Array<any>) {
 
   try {
     insertArr.forEach((value: any) =>
-      arr.splice(Math.random() * arr.length, 0, value)
+      arr.splice(Math.random() * arr.length, 0, value),
     );
   } catch (e) {}
 
@@ -22,10 +21,10 @@ function randomInsert(insertArr: Array<any>, arr: Array<any>) {
 }
 
 function parsePath(href: string) {
-  let arr: Array<string | null> = href.split("/");
+  let arr: Array<string | null> = href.split('/');
 
   while (true) {
-    let index = arr.indexOf("..");
+    let index = arr.indexOf('..');
     if (index === -1) {
       break;
     }
@@ -36,7 +35,7 @@ function parsePath(href: string) {
     arr = arr.filter(d => d);
   }
 
-  return arr.join("/");
+  return arr.join('/');
 }
 
 Component({
@@ -46,51 +45,51 @@ Component({
     // 或者缓存 key (pass-md-by-cache="{{true}}")
     markdown: {
       type: String,
-      value: "", // '# title'
-      optionalTypes: [String, Object]
+      value: '', // '# title'
+      optionalTypes: [String, Object],
     },
     theme: {
       type: String,
-      value: "light" // 'light' | 'dark'
+      value: 'light', // 'light' | 'dark'
     },
     ad: {
       type: Array,
-      value: [] // ["",""]
+      value: [], // ["",""]
     },
     fontType: {
       type: String,
-      value: ""
+      value: '',
     },
     folder: {
       type: String,
-      value: ""
+      value: '',
     },
     isTowxml: {
       // 属性 markdown 是否为 towxml 处理过的数据
       type: Boolean,
-      value: false
+      value: false,
     },
     navigator: {
       // 是否触发点击事件，若为目录(summary)请设为 false
       type: Boolean,
-      value: true
+      value: true,
     },
     key: {
       // markdown key, 启用缓存时需要
       type: String,
-      value: ""
+      value: '',
     },
     cache: {
       // 是否启用缓存
       type: Boolean,
-      value: true
+      value: true,
     },
     passMdByCache: {
       // markdown 传入的是 MD 数据缓存 key,
       // 即 markdown 可以传入 md 原始数据，
       // 也可以传入缓存 key(这个 缓存 key 存储的是 md 原始数据)
       type: Boolean,
-      value: false
+      value: false,
     },
     richtext: {
       // 使用 rich-text 渲染，若为目录(summary)请设为 false，因为不支持跳转
@@ -99,14 +98,14 @@ Component({
       // 不支持事件监听
       // https://developers.weixin.qq.com/miniprogram/dev/component/rich-text.html
       type: Boolean,
-      value: false
-    }
+      value: false,
+    },
   },
   data: {
-    MDdata: ""
+    MDdata: '',
   },
   lifetimes: {
-    attached(): void {}
+    attached(): void {},
   },
   observers: {
     markdown() {
@@ -119,31 +118,33 @@ Component({
         key,
         cache,
         passMdByCache,
-        richtext
+        richtext,
+        folder,
+        navigator,
       } = this.properties;
 
       if (passMdByCache) {
         markdown = wx.getStorageSync(markdown);
-        console.log("get markdown from cache");
+        console.log('get markdown from cache');
       }
 
-      if (markdown === "") {
+      if (markdown === '') {
         this.setData({
-          MDdata: ""
+          MDdata: '',
         });
 
         return;
       }
 
       if (isTowxml) {
-        if (richtext) {
-          markdown.child = toRichtext(markdown.child);
-          markdown.richtext = true;
-          markdown.adId = ad[0];
-        }
+        // if (richtext) {
+        //   markdown.child = toRichtext(markdown.child);
+        //   markdown.richtext = true;
+        //   markdown.adId = ad[0];
+        // }
 
         this.setData({
-          MDdata: markdown
+          MDdata: markdown,
         });
 
         return;
@@ -151,42 +152,86 @@ Component({
 
       let MDdata: any;
 
-      let MDdataFromCache = wx.getStorageSync(`wx-markdown/${key}`);
+      let MDdataFromCache = wx.getStorageSync(`wx-markdown-3/${key}`);
 
-      if (key !== "" && MDdataFromCache && cache) {
+      if (key !== '' && MDdataFromCache && cache) {
         MDdata = JSON.parse(MDdataFromCache);
-        console.log("wx-markdown cached");
+        console.log('wx-markdown cached');
       } else {
-        MDdata = towxml.toJson(markdown, "markdown");
+        MDdata = towxml(markdown, 'markdown', {
+          events: {
+            tap: res => {
+              console.log('tap', res);
+
+              console.log(res);
+              let href = res.currentTarget.dataset.data.attr.href || '';
+
+              if (href !== '') {
+                console.log(href);
+              }
+
+              if (href.match(/^https:\/\/github.com/)) {
+                let array = href.split('/');
+                let user = array[3] || null;
+                let repo = array[4] || null;
+
+                openGithub(user, repo);
+              }
+
+              if (
+                href.match(/^http:\/\//g) ||
+                href.match(/^https:\/\//g) ||
+                href === '' ||
+                !href.match(/.md$/g) ||
+                !navigator
+              ) {
+                return;
+              }
+
+              href = folder === '/' ? href : folder + href;
+
+              if (href.match(/../g)) {
+                console.log(href);
+                href = parsePath(href);
+              }
+
+              wx.navigateTo({
+                url: 'index?key=' + href,
+              });
+
+              return null;
+            },
+          },
+        });
         wx.setStorage({
-          key: `wx-markdown/${key}`,
-          data: JSON.stringify(MDdata)
+          key: `wx-markdown-3/${key}`,
+          data: JSON.stringify(MDdata),
         });
       }
 
-      if (richtext) {
-        // 富文本不能包括 ad
-        MDdata.child = toRichtext(MDdata.child);
-        MDdata.richtext = true;
-        MDdata.adId = ad[0];
-      } else {
-        if (ad !== []) {
-          MDdata.child = randomInsert(
-            ad.map((adId: string) => {
-              return { node: "ad", adId };
-            }),
-            MDdata.child
-          );
-        }
-      }
+      // if (richtext) {
+      //   // 富文本不能包括 ad
+      //   MDdata.child = toRichtext(MDdata.child);
+      //   MDdata.richtext = true;
+      //   MDdata.adId = ad[0];
+      // } else {
+      //   if (ad !== []) {
+      //     MDdata.child = randomInsert(
+      //       ad.map((adId: string) => {
+      //         return { node: 'ad', adId };
+      //       }),
+      //       MDdata.child,
+      //     );
+      //   }
+      // }
 
       MDdata.theme = theme;
       MDdata.fontType = fontType;
 
       this.setData({
-        MDdata
+        MDdata,
       });
-    }
+    },
   },
   // @ts-ignore
   methods: {
@@ -225,18 +270,18 @@ Component({
     },
 
     // @ts-ignore
-    __bind_tap(res: any) {
+    _tap(res: any) {
       console.log(res);
-      let href = res.currentTarget.dataset._el.attr.href || "";
+      let href = res.currentTarget.dataset.data.attr.href || '';
 
-      if (href !== "") {
+      if (href !== '') {
         console.log(href);
       }
 
       const { folder, navigator } = this.properties;
 
       if (href.match(/^https:\/\/github.com/)) {
-        let array = href.split("/");
+        let array = href.split('/');
         let user = array[3] || null;
         let repo = array[4] || null;
 
@@ -246,14 +291,14 @@ Component({
       if (
         href.match(/^http:\/\//g) ||
         href.match(/^https:\/\//g) ||
-        href === "" ||
+        href === '' ||
         !href.match(/.md$/g) ||
         !navigator
       ) {
         return;
       }
 
-      href = folder === "/" ? href : folder + href;
+      href = folder === '/' ? href : folder + href;
 
       if (href.match(/../g)) {
         console.log(href);
@@ -261,7 +306,7 @@ Component({
       }
 
       wx.navigateTo({
-        url: "index?key=" + href
+        url: 'index?key=' + href,
       });
 
       return null;
@@ -271,6 +316,6 @@ Component({
 
     adError(e) {
       console.log(e);
-    }
-  }
+    },
+  },
 });

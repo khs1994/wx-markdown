@@ -1,12 +1,12 @@
 {
-  "name": "wx-markdown",
-  "version": "0.0.6",
+  "name": "wx-markdown-next",
+  "version": "0.0.1",
   "miniprogram": "markdown",
   "dependencies": {
-    "@pcit/towxml": "0.0.2"
+    "towxml": "docker-practice/towxml"
   },
   "devDependencies": {
-    "miniprogram-api-typings": "^2.9.0"
+    "miniprogram-api-typings": "^2.10.0"
   },
   "scripts": {
     "build": "npx tsc",
@@ -15,6 +15,6 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/docker-practice/wx-markdown.git"
+    "url": "git+https://github.com/docker-practice/wx-markdown-next.git"
   }
 }

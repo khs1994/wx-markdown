@@ -7,10 +7,8 @@ var __spreadArrays = (this && this.__spreadArrays) || function () {
     return r;
 };
 exports.__esModule = true;
-var MarkdownHandler = require("@pcit/towxml");
 var openGitHub_1 = require("../utils/openGitHub");
-var towxml = new MarkdownHandler();
-var toRichtext_1 = require("./toRichtext");
+var towxml = require("towxml");
 function randomInsert(insertArr, arr) {
     // console.log(arr.length);
     if (arr.length > 30) {
@@ -28,9 +26,9 @@ function randomInsert(insertArr, arr) {
     return arr;
 }
 function parsePath(href) {
-    var arr = href.split("/");
+    var arr = href.split('/');
     while (true) {
-        var index = arr.indexOf("..");
+        var index = arr.indexOf('..');
         if (index === -1) {
             break;
         }
@@ -39,7 +37,7 @@ function parsePath(href) {
         // remove null
         arr = arr.filter(function (d) { return d; });
     }
-    return arr.join("/");
+    return arr.join('/');
 }
 Component({
     properties: {
@@ -48,24 +46,24 @@ Component({
         // 或者缓存 key (pass-md-by-cache="{{true}}")
         markdown: {
             type: String,
-            value: "",
+            value: '',
             optionalTypes: [String, Object]
         },
         theme: {
             type: String,
-            value: "light" // 'light' | 'dark'
+            value: 'light'
         },
         ad: {
             type: Array,
-            value: [] // ["",""]
+            value: []
         },
         fontType: {
             type: String,
-            value: ""
+            value: ''
         },
         folder: {
             type: String,
-            value: ""
+            value: ''
         },
         isTowxml: {
             // 属性 markdown 是否为 towxml 处理过的数据
@@ -80,7 +78,7 @@ Component({
         key: {
             // markdown key, 启用缓存时需要
             type: String,
-            value: ""
+            value: ''
         },
         cache: {
             // 是否启用缓存
@@ -105,61 +103,96 @@ Component({
         }
     },
     data: {
-        MDdata: ""
+        MDdata: ''
     },
     lifetimes: {
         attached: function () { }
     },
     observers: {
         markdown: function () {
-            var _a = this.properties, markdown = _a.markdown, theme = _a.theme, ad = _a.ad, fontType = _a.fontType, isTowxml = _a.isTowxml, key = _a.key, cache = _a.cache, passMdByCache = _a.passMdByCache, richtext = _a.richtext;
+            var _a = this.properties, markdown = _a.markdown, theme = _a.theme, ad = _a.ad, fontType = _a.fontType, isTowxml = _a.isTowxml, key = _a.key, cache = _a.cache, passMdByCache = _a.passMdByCache, richtext = _a.richtext, folder = _a.folder, navigator = _a.navigator;
             if (passMdByCache) {
                 markdown = wx.getStorageSync(markdown);
-                console.log("get markdown from cache");
+                console.log('get markdown from cache');
             }
-            if (markdown === "") {
+            if (markdown === '') {
                 this.setData({
-                    MDdata: ""
+                    MDdata: ''
                 });
                 return;
             }
             if (isTowxml) {
-                if (richtext) {
-                    markdown.child = toRichtext_1["default"](markdown.child);
-                    markdown.richtext = true;
-                    markdown.adId = ad[0];
-                }
+                // if (richtext) {
+                //   markdown.child = toRichtext(markdown.child);
+                //   markdown.richtext = true;
+                //   markdown.adId = ad[0];
+                // }
                 this.setData({
                     MDdata: markdown
                 });
                 return;
             }
             var MDdata;
-            var MDdataFromCache = wx.getStorageSync("wx-markdown/" + key);
-            if (key !== "" && MDdataFromCache && cache) {
+            var MDdataFromCache = wx.getStorageSync("wx-markdown-3/" + key);
+            if (key !== '' && MDdataFromCache && cache) {
                 MDdata = JSON.parse(MDdataFromCache);
-                console.log("wx-markdown cached");
+                console.log('wx-markdown cached');
             }
             else {
-                MDdata = towxml.toJson(markdown, "markdown");
+                MDdata = towxml(markdown, 'markdown', {
+                    events: {
+                        tap: function (res) {
+                            console.log('tap', res);
+                            console.log(res);
+                            var href = res.currentTarget.dataset.data.attr.href || '';
+                            if (href !== '') {
+                                console.log(href);
+                            }
+                            if (href.match(/^https:\/\/github.com/)) {
+                                var array = href.split('/');
+                                var user = array[3] || null;
+                                var repo = array[4] || null;
+                                openGitHub_1["default"](user, repo);
+                            }
+                            if (href.match(/^http:\/\//g) ||
+                                href.match(/^https:\/\//g) ||
+                                href === '' ||
+                                !href.match(/.md$/g) ||
+                                !navigator) {
+                                return;
+                            }
+                            href = folder === '/' ? href : folder + href;
+                            if (href.match(/../g)) {
+                                console.log(href);
+                                href = parsePath(href);
+                            }
+                            wx.navigateTo({
+                                url: 'index?key=' + href
+                            });
+                            return null;
+                        }
+                    }
+                });
                 wx.setStorage({
-                    key: "wx-markdown/" + key,
+                    key: "wx-markdown-3/" + key,
                     data: JSON.stringify(MDdata)
                 });
             }
-            if (richtext) {
-                // 富文本不能包括 ad
-                MDdata.child = toRichtext_1["default"](MDdata.child);
-                MDdata.richtext = true;
-                MDdata.adId = ad[0];
-            }
-            else {
-                if (ad !== []) {
-                    MDdata.child = randomInsert(ad.map(function (adId) {
-                        return { node: "ad", adId: adId };
-                    }), MDdata.child);
-                }
-            }
+            // if (richtext) {
+            //   // 富文本不能包括 ad
+            //   MDdata.child = toRichtext(MDdata.child);
+            //   MDdata.richtext = true;
+            //   MDdata.adId = ad[0];
+            // } else {
+            //   if (ad !== []) {
+            //     MDdata.child = randomInsert(
+            //       ad.map((adId: string) => {
+            //         return { node: 'ad', adId };
+            //       }),
+            //       MDdata.child,
+            //     );
+            //   }
+            // }
             MDdata.theme = theme;
             MDdata.fontType = fontType;
             this.setData({
@@ -201,33 +234,33 @@ Component({
             // console.log('触摸中' + res);
         },
         // @ts-ignore
-        __bind_tap: function (res) {
+        _tap: function (res) {
             console.log(res);
-            var href = res.currentTarget.dataset._el.attr.href || "";
-            if (href !== "") {
+            var href = res.currentTarget.dataset.data.attr.href || '';
+            if (href !== '') {
                 console.log(href);
             }
             var _a = this.properties, folder = _a.folder, navigator = _a.navigator;
             if (href.match(/^https:\/\/github.com/)) {
-                var array = href.split("/");
+                var array = href.split('/');
                 var user = array[3] || null;
                 var repo = array[4] || null;
                 openGitHub_1["default"](user, repo);
             }
             if (href.match(/^http:\/\//g) ||
                 href.match(/^https:\/\//g) ||
-                href === "" ||
+                href === '' ||
                 !href.match(/.md$/g) ||
                 !navigator) {
                 return;
             }
-            href = folder === "/" ? href : folder + href;
+            href = folder === '/' ? href : folder + href;
             if (href.match(/../g)) {
                 console.log(href);
                 href = parsePath(href);
             }
             wx.navigateTo({
-                url: "index?key=" + href
+                url: 'index?key=' + href
             });
             return null;
         },
