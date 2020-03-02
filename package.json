@@ -1,9 +1,9 @@
 {
-  "name": "wx-markdown-next",
+  "name": "wx-markdown",
   "version": "0.0.1",
   "miniprogram": "markdown",
   "dependencies": {
-    "towxml": "docker-practice/towxml"
+    "towxml": "khs1994/towxml"
   },
   "devDependencies": {
     "miniprogram-api-typings": "^2.10.0"
