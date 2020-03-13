@@ -215,14 +215,14 @@ Component({
       //   MDdata.richtext = true;
       //   MDdata.adId = ad[0];
       // } else {
-      //   if (ad !== []) {
-      //     MDdata.child = randomInsert(
-      //       ad.map((adId: string) => {
-      //         return { node: 'ad', adId };
-      //       }),
-      //       MDdata.child,
-      //     );
-      //   }
+        if (ad !== []) {
+          MDdata.child = randomInsert(
+            ad.map((adId: string) => {
+              return { node: 'ad', adId };
+            }),
+            MDdata.child,
+          );
+        }
       // }
 
       MDdata.theme = theme;
@@ -235,85 +235,7 @@ Component({
   },
   // @ts-ignore
   methods: {
-    // towxml 事件
-    __bind_touchend() {
-      // console.log('触摸结束' + res);
-      // let endX= res.changedTouches[0].pageX;
-      // let endY = res.changedTouches[0].pageY;
-      //
-      // let diff_y = endY - <any>this.data.startY;
-      // let diff_x = endX - <any>this.data.startX;
-      //
-      // console.log(diff_x,diff_y);
-      //
-      // if(Math.abs(diff_y) > 10 ){
-      //   return;
-      // }
-      //
-      // diff_x > 40 && this.before();
-      // diff_x < -40 && this.next();
-    },
-
-    __bind_touchstart() {
-      // console.log('触摸开始' + res);
-      // let startX=res.touches[0].pageX;
-      // let startY = res.changedTouches[0].pageY;
-      //
-      // this.setData!({
-      //   startX,
-      //   startY,
-      // });
-    },
-
-    __bind_touchmove() {
-      // console.log('触摸中' + res);
-    },
-
     // @ts-ignore
-    _tap(res: any) {
-      console.log(res);
-      let href = res.currentTarget.dataset.data.attr.href || '';
-
-      if (href !== '') {
-        console.log(href);
-      }
-
-      const { folder, navigator } = this.properties;
-
-      if (href.match(/^https:\/\/github.com/)) {
-        let array = href.split('/');
-        let user = array[3] || null;
-        let repo = array[4] || null;
-
-        openGithub(user, repo);
-      }
-
-      if (
-        href.match(/^http:\/\//g) ||
-        href.match(/^https:\/\//g) ||
-        href === '' ||
-        !href.match(/.md$/g) ||
-        !navigator
-      ) {
-        return;
-      }
-
-      href = folder === '/' ? href : folder + href;
-
-      if (href.match(/../g)) {
-        console.log(href);
-        href = parsePath(href);
-      }
-
-      wx.navigateTo({
-        url: 'index?key=' + href,
-      });
-
-      return null;
-    },
-
-    __bind_touchcancel() {},
-
     adError(e) {
       console.log(e);
     },
